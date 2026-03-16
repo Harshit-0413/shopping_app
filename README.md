@@ -1,10 +1,4 @@
-# shopping_app
-
-
 # **Collections**
-
-A full-featured e-commerce mobile app built with Flutter and Firebase.
-#  Collections
 
 A full-featured e-commerce mobile app built with Flutter and Firebase.
 
