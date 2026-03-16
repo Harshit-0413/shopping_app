@@ -1,0 +1,27 @@
+# Flutter
+flutter/ephemeral
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Firebase sensitive files — IMPORTANT
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Android
+android/.gradle
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+
+# Dependencies
+.pub-cache/
+.pub/
