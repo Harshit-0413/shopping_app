@@ -3,19 +3,18 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'auth_wrapper.dart';
 import 'payment_methods_provider.dart';
-
 import 'cart_provider.dart';
 import 'address_provider.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   final cartProvider = CartProvider();
   final addressProvider = AddressProvider();
-
   await cartProvider.loadOrders();
 
   runApp(

@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("dev.flutter.flutter-gradle-plugin") // ✅ MUST be here
-    id("com.google.gms.google-services")    // ✅ Firebase plugin
+    id("dev.flutter.flutter-gradle-plugin") //  MUST be here
+    id("com.google.gms.google-services")    //  Firebase plugin
 }
 
 android {
@@ -25,6 +25,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {

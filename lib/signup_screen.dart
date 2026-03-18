@@ -18,17 +18,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool isLoading = false;
 
-  // Common Input Decoration (same as login UI)
   InputDecoration customInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(40),
         borderSide: const BorderSide(color: Colors.grey),
       ),
-
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(40),
         borderSide: const BorderSide(
@@ -52,19 +49,36 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       setState(() => isLoading = true);
 
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+      // ✅ Create account
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+      // ✅ Send verification email
+      await credential.user?.sendEmailVerification();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Account created! Please verify your email to continue.',
+          ),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.green,
+        ),
       );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Signup successful")));
-
-      Navigator.pop(context);
+      // ✅ Don't sign out — AuthWrapper will detect unverified
+      // and show EmailVerificationScreen automatically
+      // Just pop all routes back to AuthWrapper root
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {
-      String message = "Something went wrong";
+      if (!mounted) return;
 
+      String message = "Something went wrong";
       if (e.code == 'email-already-in-use') {
         message = "Email already in use";
       } else if (e.code == 'weak-password') {
@@ -77,7 +91,7 @@ class _SignupScreenState extends State<SignupScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -101,7 +115,6 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //  Back Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.arrow_back),
@@ -119,8 +132,17 @@ class _SignupScreenState extends State<SignupScreen> {
                   // Email
                   TextFormField(
                     controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: customInputDecoration("Email"),
-                    validator: (value) => value!.isEmpty ? "Enter email" : null,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return "Enter email";
+                      if (!RegExp(
+                        r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$',
+                      ).hasMatch(value.trim())) {
+                        return "Enter a valid email address";
+                      }
+                      return null;
+                    },
                   ),
 
                   const SizedBox(height: 18),
@@ -136,7 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 18),
 
-                  //  Confirm Password
+                  // Confirm Password
                   TextFormField(
                     controller: confirmPasswordController,
                     decoration: customInputDecoration("Confirm Password"),
@@ -147,7 +169,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 30),
 
-                  //  Sign Up Button
+                  // Sign Up Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
